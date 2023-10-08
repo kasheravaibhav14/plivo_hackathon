@@ -10,6 +10,7 @@
 
 - The product I have built is a dummy banking application.
 - The main highlight is the real-time notification enabled using Plivo SMS API, and enabling multiple banking features using this API.
+- A special feature of the application is its ability to provide real time encrypted PDF statements of the requested account via SMS. The PDF is shared as a presigned downloadable URL using Amazon S3. 
 - I also attempted two-way communication using the SMS API to enable banking over SMS. However, I later discovered that Two-way SMS is unavailable in India due to certain factors.
 - I will walk you through the features one by one.
 
@@ -78,42 +79,25 @@ This section outlines the database design for the dummy banking application, hig
 
 The `User` model represents a user in the application and maintains a relationship with the `Product` table.
 
-#### Attributes:
-- **id (int):** Primary key for the User table.
-- **email (str):** Email of the user (unique).
-- **... (other attributes):** Additional user attributes.
-
 ### Product Model
 
 The `Product` model represents a product in the application and maintains a relationship with the `User` and `Transactions` tables.
 
-#### Attributes:
-- **product_id (str):** Product ID (primary key for the Product table).
-- **user_id (int):** User ID (foreign key referencing the User table).
-- **... (other attributes):** Additional product attributes.
-
 ### Transactions Model
 
 The `Transactions` model represents a transaction in the application and maintains a relationship with the `Product` table.
-
-#### Attributes:
-- **transaction_id (str):** Transaction ID (primary key for the Transactions table).
-- **product_id (str):** Product ID (foreign key referencing the Product table).
-- **... (other attributes):** Additional transaction attributes.
 
 ### Relationships
 
 - **User - Product:** One-to-many relationship. Each user can have multiple products.
 - **Product - Transactions:** One-to-many relationship. Each product can have multiple transactions.
 
-### Usage and Justification
 
 The database design effectively manages users, products, and transactions. Users can have multiple products, and each product can have multiple transactions. This design supports efficient data management and retrieval for the application's functionality.
 
-For a detailed visual representation of the database schema, refer to the provided database diagram.
+For a detailed visual representation of the database schema, refer to the provided database diagram:
 
 ![Database Diagram](database.png)
-
 
 
 ## Project File Description:
@@ -130,6 +114,7 @@ For a detailed visual representation of the database schema, refer to the provid
 - `helper_populate_transactions.py`: Python script for populating transactions.
 - `__init__.py`: Initialization file for the Python package.
 - `main.py`: Main application logic and routes.
+- `auth.py`: Routes for authentication(login and signup).
 - `models.py`: File containing models for the application (e.g., User model).
 - `plivo_utils.py`: Utility functions related to Plivo SMS API.
 - `README.md`: Project's README file.
@@ -137,8 +122,6 @@ For a detailed visual representation of the database schema, refer to the provid
 
   
 The `__init__.py` file initializes the Flask application and sets up the necessary configurations, including the database connection and login management. It registers blueprints for authentication and main application routes. The `create_app()` function creates and configures the Flask application.
-
-## File Descriptions:
 
 ### `auth.py`:
 
@@ -156,8 +139,6 @@ Contains utility functions for interacting with the Plivo SMS API. Defines funct
 
 `main.py` is a file containing the main application logic and routes for the dummy banking application. It utilizes Flask, a micro web framework in Python, to handle HTTP requests and responses. The file implements various routes to manage user authentication, product management, transactions, PDF creation, and SMS notifications.
 
-- **Blueprint Registration:**
-  - A Flask Blueprint named `'main'` is defined to organize and manage application routes related to the main functionality of the banking application.
 
 - **Routes and Functionality:**
   - `index()`: Renders the main application page (`index.html`).
@@ -171,6 +152,9 @@ Contains utility functions for interacting with the Plivo SMS API. Defines funct
   - `create_and_send_pdf()`: Creates a PDF from transaction data and sends it via SMS.
   - `inbound_sms()`: Handles inbound SMS messages. Not tested due to unavalibility of resources
 
+- **SMS Notifications:**
+  - Integrates with the Plivo API to send SMS notifications for various transactions and PDF statements.
+
 - **Error Handling:**
   - Implements error handling for various scenarios such as invalid JSON data, database errors, insufficient balance, and more.
 
@@ -178,11 +162,6 @@ Contains utility functions for interacting with the Plivo SMS API. Defines funct
   - Uses the `reportlab` library to generate PDF documents from transaction data, encrypted with User Date of Birth for security.
   - Utilizes `boto3` to upload the generated PDF to an Amazon S3 bucket.
 
-- **SMS Notifications:**
-  - Integrates with the Plivo API to send SMS notifications for various transactions and PDF delivery.
-
 - **Amazon S3 Integration:**
   - Utilizes `boto3` to upload the generated PDF to an Amazon S3 bucket.
-
-Ths file is a crucial part of the application, providing the core functionality for managing products, transactions, PDF creation, SMS notifications, and user interactions.
 
