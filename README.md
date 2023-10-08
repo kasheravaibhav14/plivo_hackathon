@@ -44,7 +44,7 @@ We can rent a Number from Plivo Numbers API to use it to send SMS. It must be ex
 
     export PLIVO_NUM=..
     git clone https://github.com/kasheravaibhav14/plivo_hackathon.git
-
+    pip3 install -r plivo_hackathon/requirements.txt
     flask run
 ```
 

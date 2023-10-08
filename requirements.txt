@@ -4,3 +4,4 @@ Flask
 Flask-SQLAlchemy
 reportlab
 boto3
+werkzeug=2.3.7
