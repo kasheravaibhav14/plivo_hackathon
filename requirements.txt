@@ -1,0 +1,6 @@
+dropbox==11.36.2
+plivo
+Flask
+Flask-SQLAlchemy
+reportlab
+boto3

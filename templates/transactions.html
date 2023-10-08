@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* Add CSS styles for the table */
+    #transactionsTable {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    #transactionsTable th,
+    #transactionsTable td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+
+    #transactionsTable th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+    }
+
+    #transactionsTable tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    #transactionsTable tr:hover {
+        background-color: #f1f1f1;
+    }
+</style>
+
+<div>
+    <h1 class="title">Transaction History</h1>
+    <form id="productForm">
+        <label for="productSelect">Select a Product:</label>
+        <select id="productSelect" name="product_id">
+            {% for product in products %}
+            <option value="{{ product.product_id }}">{{ product.product_id }} - {{ product.product_type }}</option>
+            {% endfor %}
+        </select>
+        <label for="selectedProduct">Selected Product:</label>
+        <!-- {{selected_product_id}} -->
+        <p id="selectedProduct">{{selected_product_id}}</p>
+        <br />
+        <button type="submit" formmethod="post">Get Transactions</button>
+    </form>
+
+    <table id="transactionsTable">
+        <thead>
+            <tr>
+                <th>Transaction ID</th>
+                <th>Amount Credit</th>
+                <th>Amount Debit</th>
+                <th>Transaction Date</th>
+                <th>Balance</th>
+            </tr>
+        </thead>
+        <tbody id="transactionsBody">
+            {% for transaction in transactions %}
+            <tr>
+                <td>{{ transaction.transaction_id }}</td>
+                <td>{{ transaction.amount_credit }}</td>
+                <td>{{ transaction.amount_debit }}</td>
+                <td>{{ transaction.transaction_date }}</td>
+                <td>{{ transaction.balance }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <form id="smsForm">
+        <label for="transactionCount">Number of Transactions:</label>
+        <input type="number" id="transactionCount" name="transaction_count" min="1">
+        <button id="sendSmsButton" class="button is-primary" onclick="sendSms()">Send SMS of Statement</button>
+    </form>
+</div>
+<script>
+    function sendSms() {
+        const transactionCount = document.getElementById('transactionCount').value;
+        const selProd = "{{selected_product_id}}"
+        console.log(selProd)
+
+        if (confirm(`Are you sure you want to send an SMS of the statement with ${transactionCount} transactions?`)) {
+            // User confirmed, send the POST request with transactionCount
+            const data = {
+                transaction_count: transactionCount,
+                selected_product: selProd
+            };
+
+            fetch('/createAndSendPDF', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    alert('PDF creation and SMS send request successful.');
+                    // Display flash message on the frontend
+                    // Rest of your code for displaying the flash message
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+    }
+
+</script>
+{% endblock %}
